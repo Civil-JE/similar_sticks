@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Test Stuff</title>
+</head>
+<body>
+    <h1>Wah!</h1>
+
+    <select name=model_drpdwn>
+        <option value=-1>Model</option>
+        {% for model in models %}
+            <option value={{model}}>{{model}}</option>
+        {% endfor %}
+    </select>
+</body>
