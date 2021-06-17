@@ -12,6 +12,19 @@ class Curve(db.Model):
     nicknames = db.relationship('CurveNicknames', backref='curve', lazy=True)
     make_id = db.Column(db.Integer, db.ForeignKey('make.id'), nullable=False)
 
+    def to_representation(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'make': self.make.name,
+            'curve_type': self.curve_type,
+            'face_type': self.face_type,
+            'toe_type': self.toe_type,
+            'lie': self.lie,
+            'length': self.length,
+            'nicknames': [nickname.nickname for nickname in self.nicknames]
+        }
+
 
 class CurveNicknames(db.Model):
     id = db.Column(db.Integer, primary_key=True)

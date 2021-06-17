@@ -21,3 +21,14 @@ class Stick(db.Model):
 
     curves = db.relationship('Curve', secondary=curves, lazy='subquery', backref=db.backref('sticks', lazy=True))
     flexes = db.relationship('Flex', secondary=flexes, lazy='subquery', backref=db.backref('sticks', lazy=True))
+
+    def to_representation(self):
+        return {
+            'id': self.id,
+            'make': self.make.name,
+            'year': self.year,
+            'model': self.model,
+            'kickpoint': self.kickpoint,
+            'curves': [curve.name for curve in self.curves],
+            'flexes': [flex.pounds for flex in self.flexes]
+        }
