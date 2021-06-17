@@ -27,3 +27,10 @@ def get_formatted_data():
 def get_unique_data():
     csv_service = current_app.config['CSV_DATA_SERVICE']
     return csv_service.get_unique_values()
+
+
+@maintenance_pages.route("/create_db/")
+def create_db():
+    from similar_sticks.models.base import setup_database
+    setup_database()
+    return {'result': 'success'}

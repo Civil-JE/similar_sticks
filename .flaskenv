@@ -1,0 +1,2 @@
+FLASK_APP=similar_sticks
+FLASK_ENV=development
