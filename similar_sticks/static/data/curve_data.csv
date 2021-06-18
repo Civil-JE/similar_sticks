@@ -1,0 +1,8 @@
+NAME,MAKE,CURVE_TYPE,FACE_TYPE,TOE_TYPE,LIE,LENGTH,NICKNAMES
+PM9,Bauer,mid-heel,open,round,5,medium,"[St. Louis,Hossa,Malkin,Stamkos,Larkin]"
+P92,Bauer,mid-toe,open,round,5.5,medium,"[Naslund,Backstrom,Ovechkin,Matthews]"
+P88,Bauer,mid,slightly-open,round,6,medium,"[Kane,Lindros]"
+C91,CCM,mid,neutral,round,5,medium,"[Recchi,Tavares]"
+P28,CCM,toe,open,round,5,long,"[McDavid]"
+P29,CCM,mid,open,round,5.5,medium,"[Crosby]"
+P7,Easton,mid,closed,round,5.5,short,"[Ignila]"
