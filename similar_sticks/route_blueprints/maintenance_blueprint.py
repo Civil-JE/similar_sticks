@@ -7,6 +7,13 @@ from similar_sticks.models import Make, Stick, Curve, Flex
 maintenance_pages = Blueprint('life_support', __name__, url_prefix='/life_support')
 
 
+@maintenance_pages.route("/start/")
+def start():
+    create_db()
+    load_data()
+    return {'result': 'success'}
+
+
 @maintenance_pages.route("/load_current_data/")
 def load_data():
     save_data_service = SaveDataService()

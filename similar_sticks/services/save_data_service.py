@@ -22,8 +22,6 @@ class SaveDataService:
     def _load_raw_data(self):
         csv_service = CsvDataService()
         data_path = current_app.config['STATIC_DATA_PATH']
-        import os
-        print(os.getcwd())
 
         self.raw_stick_data = csv_service.load_raw_data(data_path+'stick_data.csv')
         self.raw_curve_data = csv_service.load_raw_data(data_path+'curve_data.csv')
@@ -70,11 +68,13 @@ class SaveDataService:
     def _save_sticks(self):
         sticks = list()
         for stick in self.raw_stick_data:
+            make = Make.query.filter_by(name=stick[1].upper()).first()
             new_stick = Stick(
                 year=stick[0],
-                make_id=Make.query.filter_by(name=stick[1].upper()).first().id,
+                make_id=make.id,
                 model=stick[2],
-                kickpoint=stick[4]
+                kickpoint=stick[4],
+                search_string=stick[0] + ' ' + make.name + ' ' + stick[2]
             )
             raw_curves = stick[3].strip('[]').split(',')
             raw_flexes = stick[5].strip('[]').split(',')
