@@ -1,16 +1,146 @@
 <!doctype html>
+<script type=text/javascript src="{{url_for('static', filename='jquery.js') }}"></script>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Test Stuff</title>
-</head>
-<body>
-    <h1>Wah!</h1>
+    <head>
+        <meta charset="utf-8">
+        <title>Test Stuff</title>
+    </head>
+    <body>
+        <h1>Wah!</h1>
+        <div id="search_bar">
+            <select name="make_drpdwn" id="make_drpdwn">
+                <option value=-1 selected disabled hidden>Make</option>
+                {% for make in makes %}
+                <option value="{{ make.id }}">{{make.name}}</option>
+                {% endfor %}
+            </select>
+            <select name="flex_drpdwn" id="flex_drpdwn">
+                <option value=-1 selected disabled hidden>Flex</option>
+                {% for flex in flexes %}
+                <option value="{{ flex.pounds }}">{{flex.pounds}}</option>
+                {% endfor %}
+            </select>
+            <select name="curve_drpdwn" id="curve_drpdwn">
+                <option value=-1 selected disabled hidden>Curve</option>
+                {% for curve in curves %}
+                <option value="{{ curve.id }}">{{curve.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <hr>
+        <input type="text" id="text_search" placeholder="Search for your stick...">
+        <hr>
+        <div id="search_results">
+            <table id = "stick_tbl">
+                <tbody>
+                    <tr id=-1><td> Results go here </td></tr>
+                </tbody>
+            </table>
+        </div>
+        <script>
+            function ajax_call(url, success_function, ...json_args) {
+                var csrf_token = "{{ csrf_token() }}";
 
-    <select name=model_drpdwn>
-        <option value=-1>Model</option>
-        {% for model in models %}
-            <option value={{model}}>{{model}}</option>
-        {% endfor %}
-    </select>
-</body>
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+						xhr.setRequestHeader("X-CSRFToken", csrf_token)};
+                    }
+                });
+
+                // Args List of lists to a dict
+                var json_data = {};
+                for (let i = 0; i < json_args.length; i++) {
+                    json_data[json_args[i][0]] = json_args[i][1];
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify(json_data),
+                    contentType: 'application/json; charset=utf-8',
+                    url: url,
+                    success: function(data) {
+                        success_function(data);
+                    }
+                });
+            }
+        </script>
+        <script>
+            function update_curve_dropdown(curve_data, curve_id) {
+                $("#curve_drpdwn").empty();
+                if (curve_id == "-1"){
+                    $("#curve_drpdwn").append('<option value=-1> Curve </option>');
+                }
+                for (var i=0; i < curve_data.length; i++){
+                    $("#curve_drpdwn").append('<option value="' + curve_data[i].id + '">' + curve_data[i].name + '</option>');
+                }
+                document.getElementById('curve_drpdwn').value = curve_id;
+            }
+        </script>
+        <script>
+            function update_stick_results(stick_data) {
+                $("#stick_tbl").empty();
+                if (stick_data.length == 0) {
+                    $("#stick_tbl").append('<tr id=-1><td> Results go here </td></tr>');
+                }
+                for (var i=0; i < stick_data.length; i++) {
+                    $("#stick_tbl").append('<tr id=' + stick_data[i].id + '><td>' + stick_data[i].year +
+                        ' ' + stick_data[i].make + ' ' + stick_data[i].model +
+                        '</td><td>' + stick_data[i].flexes + '</td> <td>' +
+                        stick_data[i].curves.map(({name}) => name) + '</td></tr>');
+                }
+            }
+        </script>
+        <script>
+            function update_from_values(make_id, curve_id, flex_id) {
+                var url = "{{ url_for('viewer_pages.update_from_dropdown') }}";
+                function on_return_success(data) {
+                    var curve_data = data['curves'];
+                    var stick_data = data['sticks'];
+
+                    update_curve_dropdown(curve_data, curve_id);
+                    update_stick_results(stick_data);
+                }
+
+                ajax_call(url, on_return_success, ['make_id', make_id], ['curve_id', curve_id], ['flex_id', flex_id]);
+            }
+        </script>
+        <script>
+            function update_from_text_input(search_text) {
+                if (search_text == '') {
+                    update_stick_results([]);
+                    return;
+                }
+
+                var url = "{{ url_for('viewer_pages.update_from_text_search') }}";
+                var current_sticks = [];
+                var rows = document.getElementById('stick_tbl').rows;
+                var current_sticks = [];
+                for (let i=0; i < rows.length; i++) {
+                    current_sticks.push(rows[i].id);
+                }
+
+                function on_return_success(data) {
+                    var stick_data = data['sticks'];
+                    update_stick_results(stick_data)
+                }
+
+                ajax_call(url, on_return_success, ['current_sticks', current_sticks], ['search_text', search_text])
+            }
+        </script>
+        <script>
+            document.getElementById('make_drpdwn').onchange = function() {
+                update_from_values(this.value, document.getElementById('curve_drpdwn').value, document.getElementById('flex_drpdwn').value);
+            };
+            document.getElementById('flex_drpdwn').onchange = function() {
+                update_from_values(document.getElementById('make_drpdwn').value, document.getElementById('curve_drpdwn').value, this.value);
+            };
+            document.getElementById('curve_drpdwn').onchange = function() {
+                update_from_values(document.getElementById('make_drpdwn').value, this.value, document.getElementById('flex_drpdwn').value);
+            };
+            document.getElementById('text_search').onkeyup = function() {
+                update_from_text_input(this.value)
+            };
+        </script>
+    </body>
+</html>

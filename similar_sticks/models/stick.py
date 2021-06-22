@@ -16,6 +16,7 @@ class Stick(db.Model):
     year = db.Column(db.Integer)
     model = db.Column(db.String(120))
     kickpoint = db.Column(db.String(25))
+    search_string = db.Column(db.String(120))
 
     make_id = db.Column(db.Integer, db.ForeignKey('make.id'), nullable=False)
 
@@ -29,6 +30,7 @@ class Stick(db.Model):
             'year': self.year,
             'model': self.model,
             'kickpoint': self.kickpoint,
-            'curves': [curve.name for curve in self.curves],
+            'search_string': self.search_string,
+            'curves': [curve.to_representation() for curve in self.curves],
             'flexes': [flex.pounds for flex in self.flexes]
         }
