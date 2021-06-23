@@ -60,7 +60,7 @@ def update_from_text_search():
     for stick in sticks:
         match_count = 0
         for search_item in search_items:
-            match_count += stick.search_string.count(search_item)
+            match_count += stick.search_string.count(search_item.upper())
         if match_count:
             match_sticks.append((match_count, stick.to_representation()))
 
