@@ -9,29 +9,42 @@
     <body>
         <div class="search_body">
             <h1>Wah!</h1>
-            <div class="select">
-                <select name="make_drpdwn" id="make_drpdwn">
-                    <option value=-1 selected disabled hidden>Make</option>
-                    {% for make in makes %}
-                    <option value="{{ make.id }}">{{make.name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="select">
-                <select name="flex_drpdwn" id="flex_drpdwn">
-                    <option value=-1 selected disabled hidden>Flex</option>
-                    {% for flex in flexes %}
-                    <option value="{{ flex.pounds }}">{{flex.pounds}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="select">
-                <select name="curve_drpdwn" id="curve_drpdwn">
-                    <option value=-1 selected disabled hidden>Curve</option>
-                    {% for curve in curves %}
-                    <option value="{{ curve.id }}">{{curve.name}}</option>
-                    {% endfor %}
-                </select>
+            <div class="search_bar">
+                <div class="search_select">
+                    <select name="year_drpdwn" id="year_drpdwn">
+                        <option value=-1 selected disabled hidden>Year</option>
+                        {% for year in years %}
+                        <option value="{{ year.id }}">{{year.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search_select">
+                    <select name="make_drpdwn" id="make_drpdwn">
+                        <option value=-1 selected disabled hidden>Make</option>
+                        {% for make in makes %}
+                        <option value="{{ make['id'] }}">{{make['name']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search_select">
+                    <select name="flex_drpdwn" id="flex_drpdwn">
+                        <option value=-1 selected disabled hidden>Flex</option>
+                        {% for flex in flexes %}
+                        <option value="{{ flex['id'] }}">{{flex['name']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search_select">
+                    <select name="curve_drpdwn" id="curve_drpdwn">
+                        <option value=-1 selected disabled hidden>Curve</option>
+                        {% for curve in curves %}
+                        <option value="{{ curve['id'] }}">{{curve['name']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search_btn">
+                    <button class="custom-btn clear_btn" id="clear_btn">CLEAR</button>
+                </div>
             </div>
             <div>
                 <input type="text" id="text_search" placeholder="Search for your stick...">
@@ -82,15 +95,18 @@
             }
         </script>
         <script>
-            function update_curve_dropdown(curve_data, curve_id) {
-                $("#curve_drpdwn").empty();
-                if (curve_id == "-1"){
-                    $("#curve_drpdwn").append('<option value=-1> Curve </option>');
+            function update_dropdown(dropdown_obj, dropdown_default, dropdown_data, current_id) {
+                dropdown_obj.empty();
+                if (current_id == "-1") {
+                    dropdown_obj.append(
+                        '<option value=-1 selected disabled hidden>' + dropdown_default + '</option>'
+                    );
                 }
-                for (var i=0; i < curve_data.length; i++){
-                    $("#curve_drpdwn").append('<option value="' + curve_data[i].id + '">' + curve_data[i].name + '</option>');
+                for (var i=0; i < dropdown_data.length; i++){
+                    dropdown_obj.append(
+                        '<option value="' + dropdown_data[i].id + '">' + dropdown_data[i].name + '</option>'
+                    );
                 }
-                document.getElementById('curve_drpdwn').value = curve_id;
             }
         </script>
         <script>
@@ -108,17 +124,23 @@
             }
         </script>
         <script>
-            function update_from_values(make_id, curve_id, flex_id) {
+            function update_from_values(current_values) {
+                var make_id = current_values[0],
+                flex_id = current_values[1],
+                curve_id = current_values[2],
+                year = current_values[3];
+
                 var url = "{{ url_for('viewer_pages.update_from_dropdown') }}";
                 function on_return_success(data) {
-                    var curve_data = data['curves'];
-                    var stick_data = data['sticks'];
+                    var curve_data = data['curves'],
+                    stick_data = data['sticks'];
 
-                    update_curve_dropdown(curve_data, curve_id);
+                    update_dropdown($("#curve_drpdwn"), 'Curve', curve_data, curve_id);
                     update_stick_results(stick_data);
                 }
 
-                ajax_call(url, on_return_success, ['make_id', make_id], ['curve_id', curve_id], ['flex_id', flex_id]);
+                ajax_call(url, on_return_success, ['make_id', make_id],
+                 ['curve_id', curve_id], ['flex_id', flex_id], ['year',  year]);
             }
         </script>
         <script>
@@ -141,21 +163,62 @@
                     update_stick_results(stick_data)
                 }
 
-                ajax_call(url, on_return_success, ['current_sticks', current_sticks], ['search_text', search_text])
+                ajax_call(url, on_return_success, ['current_sticks', current_sticks], ['search_text', search_text]);
             }
         </script>
         <script>
+            function clear_filters() {
+                var url = "{{ url_for('viewer_pages.get_default_dropdown_values') }}";
+                function on_return_success(data){
+                    var years = data['years'],
+                        makes = data['makes'],
+                        flexes = data['flexes'],
+                        curves = data['curves'];
+
+                        update_dropdown($("#year_drpdwn"), 'Year', years, "-1");
+                        update_dropdown($("#make_drpdwn"), 'Make', makes, "-1");
+                        update_dropdown($("#flex_drpdwn"), 'Flex', flexes, "-1");
+                        update_dropdown($("#curve_drpdwn"), 'Curve', curves, "-1");
+                        $("#stick_tbl_body").empty();
+                        $("#stick_tbl_body").append(
+                        '<tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>'
+                        );
+                        document.getElementById('text_search').value = "";
+                }
+
+                ajax_call(url, on_return_success);
+            }
+        </script>
+        <script>
+            function get_current_values() {
+                return [
+                    document.getElementById('make_drpdwn').value,
+                    document.getElementById('flex_drpdwn').value,
+                    document.getElementById('curve_drpdwn').value,
+                    document.getElementById('year_drpdwn').value
+                ];
+            }
+        </script>
+        <script>
+            document.getElementById('year_drpdwn').onchange = function() {
+                update_from_values(get_current_values());
+            };
             document.getElementById('make_drpdwn').onchange = function() {
-                update_from_values(this.value, document.getElementById('curve_drpdwn').value, document.getElementById('flex_drpdwn').value);
+                update_from_values(get_current_values());
             };
             document.getElementById('flex_drpdwn').onchange = function() {
-                update_from_values(document.getElementById('make_drpdwn').value, document.getElementById('curve_drpdwn').value, this.value);
+                update_from_values(get_current_values());
             };
             document.getElementById('curve_drpdwn').onchange = function() {
-                update_from_values(document.getElementById('make_drpdwn').value, this.value, document.getElementById('flex_drpdwn').value);
+                update_from_values(get_current_values());
             };
+
             document.getElementById('text_search').onkeyup = function() {
-                update_from_text_input(this.value)
+                update_from_text_input(this.value);
+            };
+
+            document.getElementById('clear_btn').onclick = function() {
+                clear_filters();
             };
         </script>
     </body>

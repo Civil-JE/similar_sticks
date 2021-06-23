@@ -29,7 +29,7 @@ class SaveDataService:
         self.raw_make_data = csv_service.load_raw_data(data_path+'make_data.csv')
 
     def _save_flexes(self):
-        flexes = [Flex(pounds=int(flex[0])) for flex in self.raw_flex_data]
+        flexes = [Flex(id=int(flex[0]), name=flex[0]) for flex in self.raw_flex_data]
         db.session.bulk_save_objects(flexes)
         db.session.commit()
         return flexes
@@ -80,7 +80,7 @@ class SaveDataService:
             raw_curves = stick[3].strip('[]').split(',')
             raw_flexes = stick[5].strip('[]').split(',')
             new_stick.curves.extend(Curve.query.filter(Curve.name.in_([curve for curve in raw_curves])).all())
-            new_stick.flexes.extend(Flex.query.filter(Flex.pounds.in_([int(flex) for flex in raw_flexes])).all())
+            new_stick.flexes.extend(Flex.query.filter(Flex.id.in_([int(flex) for flex in raw_flexes])).all())
             sticks.append(new_stick)
 
         db.session.add_all(sticks)

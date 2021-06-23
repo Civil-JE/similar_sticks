@@ -35,7 +35,7 @@ def get_makes():
 
 @maintenance_pages.route("/get_flexes/")
 def get_flexes():
-    return {'result': {'flexes': [flex.pounds for flex in Flex.query.all()]}}
+    return {'result': {'flexes': [flex.id for flex in Flex.query.all()]}}
 
 
 @maintenance_pages.route("/get_curves/")

@@ -1,7 +1,8 @@
 from operator import itemgetter
-from flask import Blueprint, render_template, jsonify, request, current_app
+from flask import Blueprint, render_template, jsonify, request
 
 from similar_sticks.models import Stick, Curve, Flex, Make
+from similar_sticks.services import SearchDataService
 
 
 search_pages = Blueprint('viewer_pages', __name__)
@@ -9,27 +10,32 @@ search_pages = Blueprint('viewer_pages', __name__)
 
 @search_pages.route("/")
 def main_search():
-    flexes = Flex.query.all()
-    makes = Make.query.all()
-    curves = Curve.query.all()
-    return render_template('base.html', flexes=flexes, makes=makes, curves=curves)
+    search_data_service = SearchDataService()
+    default_values = search_data_service.get_default_dropdowns()
+    return render_template('base.html', years=default_values['years'], flexes=default_values['flexes'],
+                           makes=default_values['makes'], curves=default_values['curves'])
 
 
 @search_pages.route("/update_from_dropdown", methods=['POST'])
 def update_from_dropdown():
     req = request.json
+    year = int(req.get('year')) if req.get('year') else 0
     make_id = int(req.get('make_id')) if req.get('make_id') else 0
     flex_id = int(req.get('flex_id')) if req.get('flex_id') else 0
     curve_id = int(req.get('curve_id')) if req.get('curve_id') else 0
 
     sticks = Stick.query
     curves = Curve.query
+
+    if year > 0:
+        sticks = sticks.filter_by(year=year)
+
     if make_id > 0:
         sticks = sticks.filter_by(make_id=make_id)
         curves = curves.filter_by(make_id=make_id)
 
     if flex_id > 0:
-        sticks = sticks.join(Stick.flexes, aliased=True).filter_by(pounds=flex_id)
+        sticks = sticks.join(Stick.flexes, aliased=True).filter_by(id=flex_id)
 
     if curve_id > 0:
         sticks = sticks.join(Stick.curves, aliased=True).filter_by(id=curve_id)
@@ -71,3 +77,10 @@ def update_from_text_search():
         result = {'sticks': []}
 
     return jsonify(result)
+
+
+@search_pages.route("/get_default_dropdown_values", methods=['POST'])
+def get_default_dropdown_values():
+    search_data_service = SearchDataService()
+    default_values = search_data_service.get_default_dropdowns()
+    return jsonify(default_values)
