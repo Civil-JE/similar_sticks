@@ -69,12 +69,13 @@ class SaveDataService:
         sticks = list()
         for stick in self.raw_stick_data:
             make = Make.query.filter_by(name=stick[1].upper()).first()
+            search_string = stick[0] + ' ' + make.name + ' ' + stick[2]
             new_stick = Stick(
                 year=stick[0],
                 make_id=make.id,
                 model=stick[2],
                 kickpoint=stick[4],
-                search_string=stick[0] + ' ' + make.name + ' ' + stick[2]
+                search_string=search_string.upper()
             )
             raw_curves = stick[3].strip('[]').split(',')
             raw_flexes = stick[5].strip('[]').split(',')

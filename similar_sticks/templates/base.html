@@ -1,41 +1,57 @@
 <!doctype html>
 <script type=text/javascript src="{{url_for('static', filename='jquery.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <title>Test Stuff</title>
     </head>
     <body>
-        <h1>Wah!</h1>
-        <div id="search_bar">
-            <select name="make_drpdwn" id="make_drpdwn">
-                <option value=-1 selected disabled hidden>Make</option>
-                {% for make in makes %}
-                <option value="{{ make.id }}">{{make.name}}</option>
-                {% endfor %}
-            </select>
-            <select name="flex_drpdwn" id="flex_drpdwn">
-                <option value=-1 selected disabled hidden>Flex</option>
-                {% for flex in flexes %}
-                <option value="{{ flex.pounds }}">{{flex.pounds}}</option>
-                {% endfor %}
-            </select>
-            <select name="curve_drpdwn" id="curve_drpdwn">
-                <option value=-1 selected disabled hidden>Curve</option>
-                {% for curve in curves %}
-                <option value="{{ curve.id }}">{{curve.name}}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <hr>
-        <input type="text" id="text_search" placeholder="Search for your stick...">
-        <hr>
-        <div id="search_results">
-            <table id = "stick_tbl">
-                <tbody>
-                    <tr id=-1><td> Results go here </td></tr>
-                </tbody>
-            </table>
+        <div class="search_body">
+            <h1>Wah!</h1>
+            <div class="select">
+                <select name="make_drpdwn" id="make_drpdwn">
+                    <option value=-1 selected disabled hidden>Make</option>
+                    {% for make in makes %}
+                    <option value="{{ make.id }}">{{make.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="select">
+                <select name="flex_drpdwn" id="flex_drpdwn">
+                    <option value=-1 selected disabled hidden>Flex</option>
+                    {% for flex in flexes %}
+                    <option value="{{ flex.pounds }}">{{flex.pounds}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="select">
+                <select name="curve_drpdwn" id="curve_drpdwn">
+                    <option value=-1 selected disabled hidden>Curve</option>
+                    {% for curve in curves %}
+                    <option value="{{ curve.id }}">{{curve.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <input type="text" id="text_search" placeholder="Search for your stick...">
+            </div>
+            <div class="container">
+                <table id="stick_tbl">
+                    <thead>
+                        <tr>
+                            <th> Year </th>
+                            <th> Make </th>
+                            <th> Model </th>
+                            <th> Flex </th>
+                            <th> Curve </th>
+                        </tr>
+                    </thead>
+                    <tbody id="stick_tbl_body">
+                        <tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <script>
             function ajax_call(url, success_function, ...json_args) {
@@ -79,13 +95,13 @@
         </script>
         <script>
             function update_stick_results(stick_data) {
-                $("#stick_tbl").empty();
+                $("#stick_tbl_body").empty();
                 if (stick_data.length == 0) {
-                    $("#stick_tbl").append('<tr id=-1><td> Results go here </td></tr>');
+                    $("#stick_tbl_body").append('<tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>');
                 }
                 for (var i=0; i < stick_data.length; i++) {
-                    $("#stick_tbl").append('<tr id=' + stick_data[i].id + '><td>' + stick_data[i].year +
-                        ' ' + stick_data[i].make + ' ' + stick_data[i].model +
+                    $("#stick_tbl_body").append('<tr id=' + stick_data[i].id + '><td>' + stick_data[i].year +
+                        '</td><td>' + stick_data[i].make + '</td><td>' + stick_data[i].model +
                         '</td><td>' + stick_data[i].flexes + '</td> <td>' +
                         stick_data[i].curves.map(({name}) => name) + '</td></tr>');
                 }
@@ -114,7 +130,7 @@
 
                 var url = "{{ url_for('viewer_pages.update_from_text_search') }}";
                 var current_sticks = [];
-                var rows = document.getElementById('stick_tbl').rows;
+                var rows = document.getElementById('stick_tbl_body').rows;
                 var current_sticks = [];
                 for (let i=0; i < rows.length; i++) {
                     current_sticks.push(rows[i].id);
