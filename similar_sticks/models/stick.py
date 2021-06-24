@@ -6,7 +6,7 @@ curves = db.Table('curves',
                   db.Column('stick_id', db.Integer, db.ForeignKey('stick.id'), primary_key=True)
                   )
 flexes = db.Table('flexes',
-                  db.Column('flex_id', db.Integer, db.ForeignKey('flex.pounds'), primary_key=True),
+                  db.Column('flex_id', db.Integer, db.ForeignKey('flex.id'), primary_key=True),
                   db.Column('stick_id', db.Integer, db.ForeignKey('stick.id'), primary_key=True)
                   )
 
@@ -32,5 +32,5 @@ class Stick(db.Model):
             'kickpoint': self.kickpoint,
             'search_string': self.search_string,
             'curves': [curve.to_representation() for curve in self.curves],
-            'flexes': [flex.pounds for flex in self.flexes]
+            'flexes': [flex.id for flex in self.flexes]
         }

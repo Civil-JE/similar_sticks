@@ -70,7 +70,7 @@ select::-ms-expand {
   display: none;
 }
 /* Custom Select */
-.select {
+.search_select {
   position: relative;
   display: inline-flex;
   width: 10em;
@@ -79,6 +79,7 @@ select::-ms-expand {
   overflow: hidden;
   border-radius: .25em;
 }
+
 select {
   font-size: 1em;
   flex: 1;
@@ -87,7 +88,7 @@ select {
   cursor: pointer;
 }
 /* Arrow */
-.select::after {
+.search_select::after {
   content: '\25BC';
   position: absolute;
   top: 0;
@@ -101,10 +102,53 @@ select {
   transition: .25s all ease;
 }
 /* Transition */
-.select:hover::after {
+.search_select:hover::after {
   color: #8cbbed;
 }
 
-.search_bar {
-    display: inline-block;
+/* Button stuff */
+.search_btn {
+  position: relative;
+  display: inline-flex;
+  width: 5em;
+  height: 3em;
+}
+
+.custom-btn {
+  width: 130px;
+  height: 40px;
+  padding: 10px 25px;
+  border: 2px solid rgba(150, 150, 200, .5);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.clear_btn {
+  background: #474f80;
+  color: #fff;
+  z-index: 1;
+}
+.clear_btn:after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  background: #8cbbed;
+  transition: all 0.3s ease;
+}
+.clear_btn:hover {
+  color: #000;
+}
+.clear_btn:hover:after {
+  top: 0;
+  height: 100%;
+}
+.clear_btn:active {
+  top: 2px;
 }

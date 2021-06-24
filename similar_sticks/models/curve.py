@@ -25,6 +25,12 @@ class Curve(db.Model):
             'nicknames': [nickname.nickname for nickname in self.nicknames]
         }
 
+    def get_id_and_name(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class CurveNicknames(db.Model):
     id = db.Column(db.Integer, primary_key=True)
