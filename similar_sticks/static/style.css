@@ -86,6 +86,18 @@ select::-ms-expand {
   border-radius: .25em;
 }
 
+.flex_select {
+  width: 4em;
+  height: 2em;
+  line-height: 2;
+}
+
+.curve_select {
+  width: 5em;
+  height: 2em;
+  line-height: 2;
+}
+
 select {
   font-size: 1em;
   flex: 1;
@@ -93,6 +105,7 @@ select {
   color: #fff;
   cursor: pointer;
 }
+
 /* Arrow */
 .search_select::after {
   content: '\25BC';
@@ -107,6 +120,19 @@ select {
   -o-transition: .25s all ease;
   transition: .25s all ease;
 }
+
+/* Arrow */
+.flex_select::after {
+  padding: 0 0.1em;
+  color: #fff;
+}
+
+/* Arrow */
+.curve_select::after {
+  padding: 0 0.1em;
+  color: #fff;
+}
+
 /* Transition */
 .search_select:hover::after {
   color: #8cbbed;

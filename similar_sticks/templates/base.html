@@ -133,6 +133,30 @@
             }
         </script>
         <script>
+            function format_tr_flex(flex_data) {
+                var select_options = '<div class="search_select flex_select"><select class="flex_opts" name="flex_opts">'
+                for (var i=0; i < flex_data.length; i++) {
+                    var new_tr = '<option name="flex_tr_option" class="flex_tr_option" id=' +
+                        flex_data[i] + '>' + flex_data[i] + '</option>'
+                    select_options += new_tr
+                }
+                select_options += '</select></div>'
+                return select_options
+            }
+        </script>
+        <script>
+            function format_tr_curve(curve_data) {
+                var select_options = '<div class="search_select curve_select"><select class="curve_opts" name="curve_opts">'
+                for (var i=0; i < curve_data.length; i++) {
+                    var new_tr = '<option name="curve_tr_option" class="curve_tr_option" id=' +
+                        curve_data[i].id + '>' + curve_data[i].name + '</option>'
+                    select_options += new_tr
+                }
+                select_options += '</select></div>'
+                return select_options
+            }
+        </script>
+        <script>
             function update_stick_results(stick_data) {
                 $("#stick_tbl_body").empty();
                 if (stick_data.length == 0) {
@@ -142,8 +166,8 @@
                     $("#stick_tbl_body").append('<tr class="stick_result" id=' + stick_data[i].id +
                         ' onClick=alertrowclick()><td>' +
                         stick_data[i].year + '</td><td>' + stick_data[i].make + '</td><td>' +
-                        stick_data[i].model + '</td><td>' + stick_data[i].flexes + '</td> <td>' +
-                         stick_data[i].curves.map(({name}) => name) + '</td></tr>');
+                        stick_data[i].model + '</td><td>' + format_tr_flex(stick_data[i].flexes) + '</td> <td>' +
+                         format_tr_curve(stick_data[i].curves) + '</td></tr>');
                 }
             }
         </script>
