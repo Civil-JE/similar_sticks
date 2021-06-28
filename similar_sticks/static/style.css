@@ -80,9 +80,14 @@ select::-ms-expand {
   border-radius: .25em;
 }
 
-/* Custom Select */
 .flex_select {
   width: 4em;
+  height: 2em;
+  line-height: 2;
+}
+
+.curve_select {
+  width: 5em;
   height: 2em;
   line-height: 2;
 }
@@ -112,6 +117,12 @@ select {
 
 /* Arrow */
 .flex_select::after {
+  padding: 0 0.1em;
+  color: #fff;
+}
+
+/* Arrow */
+.curve_select::after {
   padding: 0 0.1em;
   color: #fff;
 }
