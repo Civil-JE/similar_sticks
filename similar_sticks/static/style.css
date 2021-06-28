@@ -11,8 +11,14 @@ body {
 }
 
 .search_body {
+    width: 50%;
+    float: left;
     position: relative;
     left: 5%;
+}
+
+.compare_body {
+    float: left
 }
 
 table {

@@ -50,7 +50,7 @@
                 <input type="text" id="text_search" placeholder="Search for your stick...">
             </div>
             <div class="container">
-                <table id="stick_tbl">
+                <table class="stick_tbl" id="stick_tbl">
                     <thead>
                         <tr>
                             <th> Year </th>
@@ -66,6 +66,29 @@
                 </table>
             </div>
         </div>
+        <div class="compare_body">
+            <div class="container">
+                <table class="stick_tbl" id="stick_tbl2">
+                    <thead>
+                        <tr>
+                            <th> Year </th>
+                            <th> Make </th>
+                            <th> Model </th>
+                            <th> Flex </th>
+                            <th> Curve </th>
+                        </tr>
+                    </thead>
+                    <tbody id="stick_tbl_body2">
+                        <tr id=-10><td> Results go here </td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function alertrowclick() {
+                console.log('wah');
+            }
+        </script>
         <script>
             function ajax_call(url, success_function, ...json_args) {
                 var csrf_token = "{{ csrf_token() }}";
@@ -116,10 +139,11 @@
                     $("#stick_tbl_body").append('<tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>');
                 }
                 for (var i=0; i < stick_data.length; i++) {
-                    $("#stick_tbl_body").append('<tr id=' + stick_data[i].id + '><td>' + stick_data[i].year +
-                        '</td><td>' + stick_data[i].make + '</td><td>' + stick_data[i].model +
-                        '</td><td>' + stick_data[i].flexes + '</td> <td>' +
-                        stick_data[i].curves.map(({name}) => name) + '</td></tr>');
+                    $("#stick_tbl_body").append('<tr class="stick_result" id=' + stick_data[i].id +
+                        ' onClick=alertrowclick()><td>' +
+                        stick_data[i].year + '</td><td>' + stick_data[i].make + '</td><td>' +
+                        stick_data[i].model + '</td><td>' + stick_data[i].flexes + '</td> <td>' +
+                         stick_data[i].curves.map(({name}) => name) + '</td></tr>');
                 }
             }
         </script>
