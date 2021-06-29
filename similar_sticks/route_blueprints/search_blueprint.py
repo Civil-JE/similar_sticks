@@ -1,3 +1,5 @@
+import pdb
+
 from flask import Blueprint, render_template, jsonify, request
 
 from similar_sticks.services import SearchDataService
@@ -45,6 +47,13 @@ def get_default_dropdown_values():
     return jsonify(default_values)
 
 
-@search_pages.route("/get_default_dropdown_values", methods=['POST'])
+@search_pages.route("/get_comparable_sticks", methods=['POST'])
 def get_comparable_sticks():
-    pass
+    search_data_service = SearchDataService()
+    req = request.json
+    stick_id = int(req.get('stick_id'))
+    flex_id = int(req.get('flex_id'))
+    curve_id = int(req.get('curve_id'))
+
+    comparable_sticks = search_data_service.get_comparable_sticks(stick_id, flex_id, curve_id)
+    return jsonify(comparable_sticks)

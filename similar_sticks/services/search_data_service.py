@@ -58,26 +58,29 @@ class SearchDataService:
         else:
             return {'sticks': []}
 
-    def get_comparable_sticks(self, stick, flex, curve):
-        comparable_sticks = Stick.query
+    def get_comparable_sticks(self, stick_id, flex_id, curve_id):
+        all_sticks = Stick.query
+        selected_stick = all_sticks.get(stick_id)
+        selected_curve = Curve.query.get(curve_id)
 
-        similar_curves = [curve.id for curve in self.compare_curves(curve)]
+        similar_curves = [curve.id for curve in self.compare_curves(selected_curve)]
 
-        comparable_sticks = comparable_sticks.filter_by(kickpoint=stick.kickpoint)
-        comparable_sticks = comparable_sticks.join(Stick.flexes, aliased=True).filter_by(id=flex.id)
+        comparable_sticks = all_sticks.filter_by(kickpoint=selected_stick.kickpoint)
+        comparable_sticks = comparable_sticks.join(Stick.flexes, aliased=True).filter_by(id=flex_id)
         comparable_sticks = comparable_sticks.join(Stick.curves, aliased=True).filter(Curve.id.in_(similar_curves))
+        comparable_sticks = comparable_sticks.filter(Stick.id != stick_id)  # Remove the selected stick from results
 
         return {'sticks': [comparable_stick.to_representation() for comparable_stick in comparable_sticks]}
 
     def compare_curves(self, selected_curve):
-        curves = Curve.query
+        all_curves = Curve.query
 
-        curve_type_matches = curves.filter_by(curve_type=selected_curve.curve_type)
-        face_type_matches = curves.filter_by(face_type=selected_curve.face_type)
-        depth_matches = curves.filter_by(depth=selected_curve.depth)
-        toe_type_matches = curves.filter_by(toe_type=selected_curve.toe_type)
-        lie_matches = curves.filter_by(lie=selected_curve.lie)
-        length_matches = curves.filter_by(length=selected_curve.length)
+        curve_type_matches = all_curves.filter_by(curve_type=selected_curve.curve_type)
+        face_type_matches = all_curves.filter_by(face_type=selected_curve.face_type)
+        depth_matches = all_curves.filter_by(depth=selected_curve.depth)
+        toe_type_matches = all_curves.filter_by(toe_type=selected_curve.toe_type)
+        lie_matches = all_curves.filter_by(lie=selected_curve.lie)
+        length_matches = all_curves.filter_by(length=selected_curve.length)
 
         all_matches = curve_type_matches.all() + face_type_matches.all() + depth_matches.all() \
             + toe_type_matches.all() + lie_matches.all() + length_matches.all()
