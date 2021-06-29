@@ -7,63 +7,82 @@
         <title>Test Stuff</title>
     </head>
     <body>
-        <div class="search_body">
-            <h1>Wah!</h1>
-            <div class="search_bar">
-                <div class="search_select">
-                    <select name="year_drpdwn" id="year_drpdwn">
-                        <option value=-1 selected disabled hidden>Year</option>
-                        {% for year in years %}
-                        <option value="{{ year.id }}">{{year.name}}</option>
-                        {% endfor %}
-                    </select>
+        <div class="container">
+            <div class="search_body">
+                <div class="search_bar">
+                    <div class="search_select">
+                        <select name="year_drpdwn" id="year_drpdwn">
+                            <option value=-1 selected disabled hidden>Year</option>
+                            {% for year in years %}
+                            <option value="{{ year.id }}">{{year.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="search_select">
+                        <select name="make_drpdwn" id="make_drpdwn">
+                            <option value=-1 selected disabled hidden>Make</option>
+                            {% for make in makes %}
+                            <option value="{{ make['id'] }}">{{make['name']}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="search_select">
+                        <select name="flex_drpdwn" id="flex_drpdwn">
+                            <option value=-1 selected disabled hidden>Flex</option>
+                            {% for flex in flexes %}
+                            <option value="{{ flex['id'] }}">{{flex['name']}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="search_select">
+                        <select name="curve_drpdwn" id="curve_drpdwn">
+                            <option value=-1 selected disabled hidden>Curve</option>
+                            {% for curve in curves %}
+                            <option value="{{ curve['id'] }}">{{curve['name']}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="search_btn">
+                        <button class="custom-btn clear_btn" id="clear_btn">CLEAR</button>
+                    </div>
                 </div>
-                <div class="search_select">
-                    <select name="make_drpdwn" id="make_drpdwn">
-                        <option value=-1 selected disabled hidden>Make</option>
-                        {% for make in makes %}
-                        <option value="{{ make['id'] }}">{{make['name']}}</option>
-                        {% endfor %}
-                    </select>
+                <div>
+                    <input type="text" id="text_search" placeholder="Search for your stick...">
                 </div>
-                <div class="search_select">
-                    <select name="flex_drpdwn" id="flex_drpdwn">
-                        <option value=-1 selected disabled hidden>Flex</option>
-                        {% for flex in flexes %}
-                        <option value="{{ flex['id'] }}">{{flex['name']}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="search_select">
-                    <select name="curve_drpdwn" id="curve_drpdwn">
-                        <option value=-1 selected disabled hidden>Curve</option>
-                        {% for curve in curves %}
-                        <option value="{{ curve['id'] }}">{{curve['name']}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="search_btn">
-                    <button class="custom-btn clear_btn" id="clear_btn">CLEAR</button>
+                <div>
+                    <table class="stick_tbl" id="stick_tbl">
+                        <thead>
+                            <tr>
+                                <th> Year </th>
+                                <th> Make </th>
+                                <th> Model </th>
+                                <th> Flex </th>
+                                <th> Curve </th>
+                            </tr>
+                        </thead>
+                        <tbody id="stick_tbl_body">
+                            <tr><td> Results go here </td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div>
-                <input type="text" id="text_search" placeholder="Search for your stick...">
-            </div>
-            <div class="container">
-                <table id="stick_tbl">
-                    <thead>
-                        <tr>
-                            <th> Year </th>
-                            <th> Make </th>
-                            <th> Model </th>
-                            <th> Flex </th>
-                            <th> Curve </th>
-                        </tr>
-                    </thead>
-                    <tbody id="stick_tbl_body">
-                        <tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>
-                    </tbody>
-                </table>
+            <div class="compare_body">
+                <div>
+                    <table class="stick_tbl" id="compare_stick_tbl">
+                        <thead>
+                            <tr>
+                                <th> Year </th>
+                                <th> Make </th>
+                                <th> Model </th>
+                                <th> Flex </th>
+                                <th> Curve </th>
+                            </tr>
+                        </thead>
+                        <tbody id="compare_stick_tbl_body">
+                            <tr><td> Results go here </td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <script>
@@ -95,6 +114,36 @@
             }
         </script>
         <script>
+            function compare_selected_row() {
+                var current_row = document.getElementsByClassName("stick_result_selected")[0],
+                    stick_id = current_row.children[0].innerHTML,
+                    flex_id = current_row.children[4].children[0].children[0].value,
+                    curve_id = current_row.children[5].children[0].children[0].selectedOptions[0].id,
+                    url = "{{ url_for('viewer_pages.get_comparable_sticks') }}";
+
+                function on_return_success(data) {
+                    stick_data = data['sticks'];
+                    update_comparable_sticks(stick_data);
+                }
+
+                ajax_call(url, on_return_success, ['stick_id', stick_id], ['flex_id', flex_id], ['curve_id', curve_id]);
+            }
+        </script>
+        <script>
+            function select_row(event) {
+                var new_selected = event.currentTarget,
+                    old_selected = document.getElementsByClassName("stick_result_selected");
+
+                if (old_selected.length > 0) {
+                    if (new_selected != old_selected[0]) {
+                        old_selected[0].classList.replace("stick_result_selected", "stick_result");
+                    }
+                }
+                new_selected.classList.replace("stick_result", "stick_result_selected");
+                compare_selected_row();
+            }
+        </script>
+        <script>
             function update_dropdown(dropdown_obj, dropdown_default, dropdown_data, current_id) {
                 dropdown_obj.empty();
                 if (current_id == "-1") {
@@ -111,56 +160,73 @@
         </script>
         <script>
             function format_tr_flex(flex_data) {
-                var select_options = '<div class="search_select flex_select"><select class="flex_opts" name="flex_opts">'
+                var select_options = '<td name="flex_td"><div class="search_select flex_select"><select class="flex_opts" name="flex_opts">'
                 for (var i=0; i < flex_data.length; i++) {
-                    var new_tr = '<option name="flex_tr_option" class="flex_tr_option" id=' +
-                        flex_data[i] + '>' + flex_data[i] + '</option>'
-                    select_options += new_tr
+                    var new_tr = '<option class="flex_tr_option" id=' +
+                        flex_data[i] + '>' + flex_data[i] + '</option>';
+                    select_options += new_tr;
                 }
-                select_options += '</select></div>'
+                select_options += '</select></div></td>';
                 return select_options
             }
         </script>
         <script>
             function format_tr_curve(curve_data) {
-                var select_options = '<div class="search_select curve_select"><select class="curve_opts" name="curve_opts">'
+                var select_options = '<td name="curve_td"><div class="search_select curve_select"><select class="curve_opts" name="curve_opts">'
                 for (var i=0; i < curve_data.length; i++) {
-                    var new_tr = '<option name="curve_tr_option" class="curve_tr_option" id=' +
-                        curve_data[i].id + '>' + curve_data[i].name + '</option>'
-                    select_options += new_tr
+                    var new_tr = '<option class="curve_tr_option" id=' +
+                        curve_data[i].id + '>' + curve_data[i].name + '</option>';
+                    select_options += new_tr;
                 }
-                select_options += '</select></div>'
+                select_options += '</select></div></td>';
                 return select_options
             }
         </script>
         <script>
-            function update_stick_results(stick_data) {
-                $("#stick_tbl_body").empty();
+            function update_search_results(stick_data) {
+                var table = $("#stick_tbl_body")
+                table.empty();
                 if (stick_data.length == 0) {
-                    $("#stick_tbl_body").append('<tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>');
+                    table.append('<tr><td style="display:none;">-1</td><td> Results go here </td><td></td><td></td><td></td><td></td></tr>');
                 }
                 for (var i=0; i < stick_data.length; i++) {
-                    $("#stick_tbl_body").append('<tr id=' + stick_data[i].id + '><td>' + stick_data[i].year +
-                        '</td><td>' + stick_data[i].make + '</td><td>' + stick_data[i].model +
-                        '</td><td>' + format_tr_flex(stick_data[i].flexes) + '</td> <td>' +
-                        format_tr_curve(stick_data[i].curves) + '</td></tr>');
+                    table.append('<tr class="stick_result" onClick=select_row(event)>' +
+                        '<td style="display:none;">' + stick_data[i].id + '</td><td>' +
+                        stick_data[i].year + '</td><td>' + stick_data[i].make + '</td><td>' +
+                        stick_data[i].model + '</td>' + format_tr_flex(stick_data[i].flexes) +
+                        format_tr_curve(stick_data[i].curves) + '</tr>');
+                }
+            }
+            function update_comparable_sticks(stick_data) {
+                var table = $("#compare_stick_tbl_body")
+                table.empty();
+                if (stick_data.length == 0) {
+                    table.append('<tr><td style="display:none;">-1</td><td> Similar Sticks go here </td><td></td><td></td><td></td><td></td></tr>');
+                }
+                for (var i=0; i < stick_data.length; i++) {
+                    table.append('<tr class="stick_result">' +
+                        '<td style="display:none;">' + stick_data[i].id + '</td><td>' +
+                        stick_data[i].year + '</td><td>' + stick_data[i].make + '</td><td>' +
+                        stick_data[i].model + '</td><td>' + stick_data[i].flexes + '</td><td>' +
+                        stick_data[i].curves.map(function(curve) { return curve.name; }) + '</td></tr>');
                 }
             }
         </script>
         <script>
             function update_from_values(current_values) {
+                clear_text_filter();
                 var make_id = current_values[0],
-                flex_id = current_values[1],
-                curve_id = current_values[2],
-                year = current_values[3];
+                    flex_id = current_values[1],
+                    curve_id = current_values[2],
+                    year = current_values[3],
+                    url = "{{ url_for('viewer_pages.update_from_dropdown') }}";
 
-                var url = "{{ url_for('viewer_pages.update_from_dropdown') }}";
                 function on_return_success(data) {
                     var curve_data = data['curves'],
                     stick_data = data['sticks'];
 
                     update_dropdown($("#curve_drpdwn"), 'Curve', curve_data, curve_id);
-                    update_stick_results(stick_data);
+                    update_search_results(stick_data);
                 }
 
                 ajax_call(url, on_return_success, ['make_id', make_id],
@@ -170,28 +236,38 @@
         <script>
             function update_from_text_input(search_text) {
                 if (search_text == '') {
-                    update_stick_results([]);
+                    update_search_results([]);
                     return;
                 }
-
-                var url = "{{ url_for('viewer_pages.update_from_text_search') }}";
-                var current_sticks = [];
-                var rows = document.getElementById('stick_tbl_body').rows;
-                var current_sticks = [];
+                clear_dropdown_filters();
+                var url = "{{ url_for('viewer_pages.update_from_text_search') }}",
+                    current_sticks = [],
+                    rows = document.getElementById('stick_tbl_body').rows,
+                    current_sticks = [];
                 for (let i=0; i < rows.length; i++) {
                     current_sticks.push(rows[i].id);
                 }
 
                 function on_return_success(data) {
                     var stick_data = data['sticks'];
-                    update_stick_results(stick_data)
+                    update_search_results(stick_data);
                 }
 
                 ajax_call(url, on_return_success, ['current_sticks', current_sticks], ['search_text', search_text]);
             }
         </script>
         <script>
-            function clear_filters() {
+            function clear_result_tables(){
+                $("#stick_tbl_body").empty();
+                $("#stick_tbl_body").append(
+                    '<tr><td style="display:none;">-1</td><td> Results go here </td><td></td><td></td><td></td><td></td></tr>'
+                    );
+                $("#compare_stick_tbl_body").empty();
+                $("#compare_stick_tbl_body").append(
+                    '<tr><td style="display:none;">-1</td><td> Similar Sticks go here </td><td></td><td></td><td></td><td></td></tr>'
+                    );
+            }
+            function clear_dropdown_filters() {
                 var url = "{{ url_for('viewer_pages.get_default_dropdown_values') }}";
                 function on_return_success(data){
                     var years = data['years'],
@@ -203,14 +279,14 @@
                         update_dropdown($("#make_drpdwn"), 'Make', makes, "-1");
                         update_dropdown($("#flex_drpdwn"), 'Flex', flexes, "-1");
                         update_dropdown($("#curve_drpdwn"), 'Curve', curves, "-1");
-                        $("#stick_tbl_body").empty();
-                        $("#stick_tbl_body").append(
-                        '<tr id=-1><td> Results go here </td><td></td><td></td><td></td><td></td></tr>'
-                        );
-                        document.getElementById('text_search').value = "";
-                }
 
+                }
+                clear_result_tables()
                 ajax_call(url, on_return_success);
+            }
+            function clear_text_filter() {
+                document.getElementById('text_search').value = "";
+                clear_result_tables()
             }
         </script>
         <script>
@@ -242,7 +318,8 @@
             };
 
             document.getElementById('clear_btn').onclick = function() {
-                clear_filters();
+                clear_dropdown_filters();
+                clear_text_filter();
             };
         </script>
     </body>

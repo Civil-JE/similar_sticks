@@ -15,7 +15,6 @@ load_dotenv()
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     set_settings(app)
-    app.search_data_service = SearchDataService()
     app.app_context().push()
 
     from similar_sticks.models import db

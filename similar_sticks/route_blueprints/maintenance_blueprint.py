@@ -46,3 +46,16 @@ def get_curves():
 @maintenance_pages.route("/get_sticks/")
 def get_sticks():
     return {'result': {'sticks': [stick.to_representation() for stick in Stick.query.all()]}}
+
+
+@maintenance_pages.route("/test/")
+def test_stuff():
+    from similar_sticks.services import SearchDataService
+    sds = SearchDataService()
+    s = Stick.query.get(1)
+    c = Curve.query.get(5)
+    f = Flex.query.get(75)
+
+    c = sds.get_comparable_sticks(s, f, c)
+
+    return "Success"

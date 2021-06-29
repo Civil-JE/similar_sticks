@@ -10,9 +10,19 @@ body {
 	font-weight: 100;
 }
 
+.container {
+    padding: 10px;
+    display: flex;
+}
+
 .search_body {
-    position: relative;
-    left: 5%;
+  flex: 1;
+  padding: 10px;
+}
+
+.compare_body {
+  flex: 1;
+  padding: 20px;
 }
 
 table {
@@ -38,6 +48,13 @@ th {
 tbody > tr:hover {
 			background-color: rgba(255,255,255,0.1);
 		}
+
+.stick_result_selected {
+    -webkit-box-shadow:inset 0px 0px 0px 2px #7358cc;
+    -moz-box-shadow:inset 0px 0px 0px 2px #7358cc;
+    box-shadow:inset 0px 0px 0px 2px #7358cc;
+    background-color: rgba(255,255,255,0.15);
+}
 
 input {
   margin: 15px 0;

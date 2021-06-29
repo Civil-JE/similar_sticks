@@ -52,9 +52,10 @@ class SaveDataService:
                     make_id=Make.query.filter_by(name=raw_curve[1].upper()).first().id,
                     curve_type=raw_curve[2],
                     face_type=raw_curve[3],
-                    toe_type=raw_curve[4],
-                    lie=raw_curve[5],
-                    length=raw_curve[6]
+                    depth=raw_curve[3],
+                    toe_type=raw_curve[5],
+                    lie=raw_curve[6],
+                    length=raw_curve[7]
                 )
             )
             raw_nicknames = raw_curve[7].strip('[]').split(',')
