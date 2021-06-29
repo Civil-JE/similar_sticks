@@ -6,6 +6,7 @@ class Curve(db.Model):
     name = db.Column(db.String(50))
     curve_type = db.Column(db.String(50))
     face_type = db.Column(db.String(50))
+    depth = db.Column(db.String(50))
     toe_type = db.Column(db.String(50))
     lie = db.Column(db.String(5))
     length = db.Column(db.String(50))
@@ -19,6 +20,7 @@ class Curve(db.Model):
             'make': self.make.name,
             'curve_type': self.curve_type,
             'face_type': self.face_type,
+            'depth': self.depth,
             'toe_type': self.toe_type,
             'lie': self.lie,
             'length': self.length,
