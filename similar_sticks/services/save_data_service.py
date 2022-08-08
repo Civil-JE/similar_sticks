@@ -40,16 +40,32 @@ class SaveDataService:
         db.session.commit()
         return makes
 
+    def _save_makes_from_curves(self, make_data):
+        current_makes = Make.query
+        new_makes = list()
+        for make in make_data:
+            if current_makes.filter_by(name=make).count() == 0:
+                new_makes.append(Make(name=make))
+
+        db.session.add_all(new_makes)
+        db.session.commit()
+        return new_makes
+
     def _save_curves(self):
         curves = list()
         nicknames = list()
         i = 1
+        makes = list(set([curve[1] for curve in self.raw_curve_data]))
+        self._save_makes_from_curves(makes)
+
         for raw_curve in self.raw_curve_data:
+            make_query = Make.query.filter_by(name=raw_curve[1].upper())
+            make_id = make_query.first().id if make_query.count() == 1 else Make.query.get(0)
             curves.append(
                 Curve(
                     id=i,
                     name=raw_curve[0],
-                    make_id=Make.query.filter_by(name=raw_curve[1].upper()).first().id,
+                    make_id=make_id,
                     curve_type=raw_curve[2],
                     face_type=raw_curve[3],
                     depth=raw_curve[3],
